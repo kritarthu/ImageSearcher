@@ -10,7 +10,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -19,6 +18,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.walmart.imagesearch.R;
 import com.walmart.imagesearch.imagesearch.adapter.ImageResultsAdapter;
 import com.walmart.imagesearch.imagesearch.helper.EndlessScrollListener;
+import com.walmart.imagesearch.imagesearch.model.ImageFilters;
 import com.walmart.imagesearch.imagesearch.model.ImageResults;
 
 import org.json.JSONArray;
@@ -31,12 +31,13 @@ import cz.msebera.android.httpclient.Header;
 
 public class ImageSearch extends AppCompatActivity {
 
-    private EditText etQuery;
     private GridView gvImageGrid;
-    private final String url = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0";
+    private String url = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0";
     private ArrayList<ImageResults> imageResults;
     private ImageResultsAdapter imageResultsAdapter;
     String query = "";
+    private final int REQUEST_CODE = 1;
+    ImageFilters filter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +51,6 @@ public class ImageSearch extends AppCompatActivity {
     }
 
     private void setupViews() {
-        etQuery = (EditText) findViewById(R.id.etSearch);
         gvImageGrid = (GridView) findViewById(R.id.gvResults);
         gvImageGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -67,6 +67,7 @@ public class ImageSearch extends AppCompatActivity {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
                 callAPI(page, totalItemsCount);
+                imageResultsAdapter.notifyDataSetChanged();
                 return true;
             }
         });
@@ -83,7 +84,8 @@ public class ImageSearch extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String searchText) {
                 query = searchText;
-                callAPI(0,8);
+                imageResultsAdapter.clear();
+                callAPI(0, 8);
                 return true;
             }
 
@@ -104,24 +106,20 @@ public class ImageSearch extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent i = new Intent(ImageSearch.this, SearchFilter.class);
+            startActivityForResult(i, REQUEST_CODE);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public void onImageSearch(View view) {
-        this.query = this.etQuery.getText().toString();
-        imageResults.clear();
-        this.callAPI(0, 8);
-
-    }
-
     public void callAPI(int offset, int count) {
         Toast.makeText(this, "Loading images", Toast.LENGTH_SHORT).show();
 
         AsyncHttpClient httpClient = new AsyncHttpClient();
-        httpClient.get(url + "&rsz=" + count + "&start=" + offset + "&q=" + this.query, new JsonHttpResponseHandler() {
+        Log.d("INFO", count+"");
+        httpClient.get(getUrl() + "&rsz=" + count + "&start=" + offset*count + "&q=" + this.query, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d("INFO", response.toString());
@@ -134,5 +132,39 @@ public class ImageSearch extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    // ActivityOne.java, time to handle the result of the sub-activity
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // REQUEST_CODE is defined above
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+            // Extract name value from result extras
+            filter = (ImageFilters)data.getExtras().get("filter");
+            int code = data.getExtras().getInt("code", 0);
+            imageResultsAdapter.clear();
+            if(filter!=null) {
+                callAPI(0, 8);
+            }
+        }
+    }
+
+    private String getUrl() {
+        String filterUrl = url;
+        if(filter!=null) {
+            if(filter.site!="all") {
+                filterUrl = filterUrl+"&as_sitesearch="+filter.site;
+            }
+            if(filter.color!="all") {
+                filterUrl = filterUrl+"&imgcolor="+filter.color;
+            }
+            if(filter.size!="all") {
+                filterUrl = filterUrl +"&imgsz="+filter.size;
+            }
+            if(filter.type!="all") {
+                filterUrl = filterUrl+"&imgtype="+filter.type;
+            }
+        }
+        return filterUrl;
     }
 }

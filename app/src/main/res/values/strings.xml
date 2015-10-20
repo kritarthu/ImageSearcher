@@ -7,4 +7,44 @@
     <string name="ImageTitle">ImageResult</string>
     <string name="ImageDescription">New Text</string>
     <string name="title_activity_image_display">Full Image</string>
+    <string name="title_activity_search_filter_activity">search_filter_activity</string>
+    <string name="title_activity_search_filter">SearchFilter</string>
+    <string name="site_prompt">Source Website</string>
+    <string name="size_prompt">Image Size</string>
+    <string name="color_prompt">Image Color</string>
+    <string name="type_prompt">Image type</string>
+    <string name="ButtonSubmit">Submit</string>
+
+    <string-array name="colors_array">
+        <item>black</item>
+        <item>blue</item>
+        <item>brown</item>
+        <item>gray</item>
+        <item>green</item>
+        <item>orange</item>
+        <item>pink</item>
+        <item>red</item>
+        <item>white</item>
+        <item>yellow</item>
+
+    </string-array>
+    <string-array name="site_array">
+        <item>www.espn.com</item>
+        <item>www.walmart.com</item>
+        <item>www.flicker.com</item>
+        <item>www.yahoo.com</item>
+        <item>www.imgur.com</item>
+    </string-array>
+    <string-array name="size_array">
+        <item>small</item>
+        <item>medium</item>
+        <item>large</item>
+        <item>xlarge</item>
+    </string-array>
+    <string-array name="type_array">
+        <item>faces</item>
+        <item>photo</item>
+        <item>clipart</item>
+        <item>lineart</item>
+    </string-array>
 </resources>

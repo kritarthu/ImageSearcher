@@ -26,6 +26,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.walmart.imagesearch.imagesearch.activity.ImageSearch" />
         </activity>
+        <activity
+            android:name=".imagesearch.activity.SearchFilter"
+            android:label="@string/title_activity_search_filter"
+            android:parentActivityName=".imagesearch.activity.ImageSearch" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.walmart.imagesearch.imagesearch.activity.ImageSearch" />
+        </activity>
     </application>
 
 </manifest>
